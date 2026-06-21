@@ -21,9 +21,9 @@ export function ApprovalDetailView({ request, onClose }: ApprovalDetailViewProps
   };
 
   return (
-    <div className="flex-1 flex">
+    <div className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden">
       {/* Request Details Panel */}
-      <div className="flex-1 p-8 overflow-y-auto border-r border-border">
+      <div className="flex-1 p-4 sm:p-8 md:overflow-y-auto md:border-r border-border">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2>Request Details</h2>
@@ -113,7 +113,7 @@ export function ApprovalDetailView({ request, onClose }: ApprovalDetailViewProps
       </div>
 
       {/* API Policy Panel */}
-      <div className="w-96 bg-[#FBF7F1] p-8 overflow-y-auto">
+      <div className="w-full md:w-96 bg-[#FBF7F1] p-4 sm:p-8 md:overflow-y-auto border-t md:border-t-0 border-border">
         <div className="mb-6">
           <h3>API Policy</h3>
           <p className="text-sm text-muted-foreground mt-1">Governance requirements</p>

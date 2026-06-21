@@ -18,13 +18,13 @@ export function ApprovalsDashboard() {
           onClose={() => setSelectedRequest(null)}
         />
       ) : (
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 sm:p-8">
           <div className="mb-6">
             <h1>Approvals</h1>
             <p className="text-muted-foreground mt-1">Review and manage API access requests</p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <div className="bg-white border border-border rounded-lg p-4">
               <div className="text-sm text-muted-foreground">Pending Review</div>
               <div className="text-3xl font-semibold mt-1">{pendingRequests.length}</div>
@@ -43,7 +43,7 @@ export function ApprovalsDashboard() {
             <div className="border-b border-border px-6 py-4">
               <h3>Pending Approvals</h3>
             </div>
-            <div className="overflow-x-auto">
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-muted/50">
                   <tr className="border-b border-border">
@@ -100,13 +100,39 @@ export function ApprovalsDashboard() {
                 </tbody>
               </table>
             </div>
+
+            <div className="md:hidden divide-y divide-border">
+              {pendingRequests.map((request) => (
+                <div key={request.id} className="p-4">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div>
+                      <div className="font-medium">{request.requestor}</div>
+                      <div className="text-sm text-muted-foreground">{request.requestorEmail}</div>
+                    </div>
+                    <RiskBadge level={request.riskLevel} className="flex-shrink-0" />
+                  </div>
+                  <div className="text-sm mb-1">{request.applicationName}</div>
+                  <div className="text-sm font-medium">{request.apiName}</div>
+                  <div className="text-sm text-muted-foreground mb-2">{request.scopes.join(', ')}</div>
+                  <div className="text-sm text-muted-foreground mb-3">
+                    {format(new Date(request.requestedAt), 'MMM d, yyyy')}
+                  </div>
+                  <button
+                    onClick={() => setSelectedRequest(request)}
+                    className="px-3 py-1.5 bg-[#C2752E] text-white rounded text-sm hover:bg-[#9C5E25] transition-colors"
+                  >
+                    Review
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="bg-white border border-border rounded-lg mt-6">
             <div className="border-b border-border px-6 py-4">
               <h3>Recent Decisions</h3>
             </div>
-            <div className="overflow-x-auto">
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-muted/50">
                   <tr className="border-b border-border">
@@ -151,6 +177,24 @@ export function ApprovalsDashboard() {
                     ))}
                 </tbody>
               </table>
+            </div>
+
+            <div className="md:hidden divide-y divide-border">
+              {allRequests
+                .filter(req => req.status === 'approved' || req.status === 'rejected')
+                .map((request) => (
+                  <div key={request.id} className="p-4">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <div className="font-medium">{request.requestor}</div>
+                      <StatusBadge status={request.status} className="flex-shrink-0" />
+                    </div>
+                    <div className="text-sm">{request.applicationName} · {request.apiName}</div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Reviewed by {request.reviewedBy}
+                      {request.reviewedAt && ` · ${format(new Date(request.reviewedAt), 'MMM d, yyyy')}`}
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
         </div>

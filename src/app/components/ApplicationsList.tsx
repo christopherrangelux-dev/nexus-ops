@@ -32,15 +32,15 @@ export function ApplicationsList() {
   };
 
   return (
-    <div className="flex-1 p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="flex-1 p-4 sm:p-8">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <h1>Applications</h1>
           <p className="text-muted-foreground mt-1">Manage your registered applications</p>
         </div>
         <button
           onClick={() => setShowNewAppFlow(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#C2752E] text-white rounded-lg hover:bg-[#9C5E25] transition-colors"
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-[#C2752E] text-white rounded-lg hover:bg-[#9C5E25] transition-colors self-start"
         >
           <Plus className="w-4 h-4" />
           Register Application
@@ -61,7 +61,7 @@ export function ApplicationsList() {
       </div>
 
       <div className="bg-white border border-border rounded-lg">
-        <div className="overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-muted/50">
               <tr className="border-b border-border">
@@ -123,6 +123,35 @@ export function ApplicationsList() {
             </tbody>
           </table>
         </div>
+
+        <div className="md:hidden divide-y divide-border">
+          {filteredApps.map((app) => (
+            <div key={app.id} className="p-4">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div>
+                  <div className="font-medium">{app.name}</div>
+                  <div className="text-sm text-muted-foreground mt-0.5">{app.description}</div>
+                </div>
+                <StatusBadge status={app.status} className="flex-shrink-0" />
+              </div>
+              <div className="text-sm text-muted-foreground space-y-0.5 mb-3">
+                <div>{app.owner} · {app.ownerEmail}</div>
+                <div>{app.department}</div>
+                <div>
+                  Created {format(new Date(app.createdAt), 'MMM d, yyyy')} · Updated{' '}
+                  {format(new Date(app.updatedAt), 'MMM d, yyyy')}
+                </div>
+              </div>
+              <button
+                onClick={() => setChangeOrderTarget(app)}
+                className="flex items-center gap-1.5 text-sm text-[#C2752E] hover:text-[#9C5E25] transition-colors"
+              >
+                <FileEdit className="w-3.5 h-3.5" />
+                Change Order
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       {filteredApps.length === 0 && (
@@ -136,7 +165,7 @@ export function ApplicationsList() {
           <div className="border-b border-border px-6 py-4">
             <h3>Recent Change Orders</h3>
           </div>
-          <div className="overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-muted/50">
                 <tr className="border-b border-border">
@@ -164,6 +193,23 @@ export function ApplicationsList() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="md:hidden divide-y divide-border">
+            {recentChangeOrders.map((order) => (
+              <div key={order.id} className="p-4">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className="text-sm font-mono">{order.id}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {format(new Date(order.submittedAt), 'MMM d, yyyy h:mm a')}
+                  </span>
+                </div>
+                <div className="text-sm mb-1">{order.applicationName}</div>
+                <div className="text-sm font-medium">{order.changeTypeLabel}</div>
+                <div className="text-sm text-muted-foreground">{order.newValue}</div>
+                <div className="text-sm text-muted-foreground mt-1">{order.reason}</div>
+              </div>
+            ))}
           </div>
         </div>
       )}

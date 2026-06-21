@@ -14,8 +14,8 @@ export function Navigation({ activeView, onViewChange }: NavigationProps) {
   ];
 
   return (
-    <div className="w-16 bg-gray-900 text-white flex flex-col items-center py-4 gap-2">
-      <div className="mb-6">
+    <div className="fixed bottom-0 inset-x-0 z-40 flex flex-row justify-around bg-gray-900 text-white py-2 md:static md:inset-auto md:z-auto md:w-16 md:h-screen md:flex-col md:items-center md:justify-start md:py-4 md:gap-2">
+      <div className="hidden md:block mb-6">
         <div className="w-10 h-10 bg-[#C2752E] rounded-lg flex items-center justify-center">
           <span className="font-semibold text-sm">API</span>
         </div>

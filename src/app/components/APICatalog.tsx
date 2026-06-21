@@ -26,7 +26,7 @@ export function APICatalog() {
   };
 
   return (
-    <div className="flex-1 p-8">
+    <div className="flex-1 p-4 sm:p-8">
       <div className="mb-6">
         <h1>API Catalog</h1>
         <p className="text-muted-foreground mt-1">Browse available APIs and their access policies</p>
@@ -35,12 +35,12 @@ export function APICatalog() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {mockAPIs.map((api) => (
           <div key={api.id} className="bg-white border border-border rounded-lg p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
+            <div className="flex items-start justify-between gap-2 mb-4">
+              <div className="flex-1 min-w-0">
                 <h3 className="mb-1">{api.name}</h3>
                 <p className="text-sm text-muted-foreground">{api.description}</p>
               </div>
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#F1ECE2] border border-[#E7E0D2]">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#F1ECE2] border border-[#E7E0D2] flex-shrink-0">
                 {getSensitivityIcon(api.dataSensitivity)}
                 <span className="text-xs font-medium">{getSensitivityLabel(api.dataSensitivity)}</span>
               </div>

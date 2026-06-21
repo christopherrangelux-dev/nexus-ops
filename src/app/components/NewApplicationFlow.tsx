@@ -77,25 +77,53 @@ export function NewApplicationFlow({ onClose }: NewApplicationFlowProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col">
-      <div className="border-b border-border px-8 py-4 flex items-center justify-between bg-white">
+    <div className="flex-1 flex flex-col min-w-0">
+      <div className="border-b border-border px-4 sm:px-8 py-4 flex items-center justify-between bg-white gap-2">
         <div>
           <h2>Register New Application</h2>
           <p className="text-sm text-muted-foreground mt-1">Complete all sections to submit your request</p>
         </div>
         <button
           onClick={onClose}
-          className="p-2 hover:bg-muted rounded-lg transition-colors"
+          className="p-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
-      <div className="flex-1 flex">
+      <div className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden min-w-0">
         {/* Stepper Navigation */}
-        <div className="w-80 border-r border-border p-8 bg-[#FBF7F1]">
-          <div className="space-y-2">
-            {steps.map((step, index) => {
+        <div className="md:w-80 border-b md:border-b-0 md:border-r border-border p-4 sm:p-6 md:p-8 bg-[#FBF7F1] flex-shrink-0 min-w-0">
+          {/* Compact mobile stepper */}
+          <div className="flex md:hidden items-center gap-2 overflow-x-auto pb-1">
+            {steps.map((step) => {
+              const isValid = isStepValid(step.id);
+              const isActive = activeStep === step.id;
+
+              return (
+                <button
+                  key={step.id}
+                  onClick={() => setActiveStep(step.id)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg flex-shrink-0 transition-colors ${
+                    isActive
+                      ? 'bg-[#ECE9F3] border-2 border-[#C2752E]'
+                      : 'bg-white border-2 border-transparent'
+                  }`}
+                >
+                  {isValid ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-gray-400" />
+                  )}
+                  <span className="text-sm font-medium whitespace-nowrap">{step.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Full desktop stepper */}
+          <div className="hidden md:block space-y-2">
+            {steps.map((step) => {
               const isValid = isStepValid(step.id);
               const isActive = activeStep === step.id;
 
@@ -130,7 +158,7 @@ export function NewApplicationFlow({ onClose }: NewApplicationFlowProps) {
             })}
           </div>
 
-          <div className="mt-8 p-4 bg-white rounded-lg border border-border">
+          <div className="mt-4 md:mt-8 p-4 bg-white rounded-lg border border-border">
             <div className="text-sm font-medium mb-2">Progress</div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>{steps.filter(s => isStepValid(s.id)).length} of {steps.length} complete</span>
@@ -145,7 +173,7 @@ export function NewApplicationFlow({ onClose }: NewApplicationFlowProps) {
         </div>
 
         {/* Form Content */}
-        <div className="flex-1 p-8 overflow-y-auto">
+        <div className="flex-1 p-4 sm:p-8 md:overflow-y-auto min-w-0">
           {activeStep === 'business' && (
             <div className="max-w-2xl space-y-6">
               <div>

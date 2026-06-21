@@ -27,23 +27,23 @@ export default function App() {
     <div className="size-full flex bg-[#FBF7F1]">
       <Navigation activeView={activeView} onViewChange={setActiveView} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-10 bg-white border-b border-border px-6 flex items-center justify-between">
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span>Enterprise API Portal</span>
-            <span className="text-border">•</span>
-            <span className="capitalize">{activeView}</span>
+        <header className="h-10 bg-white border-b border-border px-4 sm:px-6 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 text-sm text-muted-foreground min-w-0">
+            <span className="hidden sm:inline">Enterprise API Portal</span>
+            <span className="hidden sm:inline text-border">•</span>
+            <span className="capitalize truncate">{activeView}</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-sm">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="text-sm hidden sm:block">
               <span className="text-muted-foreground">Logged in as:</span>
               <span className="ml-2 font-medium">Data Product Manager</span>
             </div>
-            <div className="w-8 h-8 rounded-full bg-[#C2752E] text-white flex items-center justify-center text-sm font-medium">
+            <div className="w-8 h-8 rounded-full bg-[#C2752E] text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
               DM
             </div>
           </div>
         </header>
-        <div className="flex-1 overflow-auto flex">
+        <div className="flex-1 overflow-auto flex pb-16 md:pb-0">
           {renderView()}
         </div>
       </div>

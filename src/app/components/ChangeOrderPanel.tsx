@@ -77,7 +77,7 @@ export function ChangeOrderPanel({ application, onClose, onSubmit }: ChangeOrder
   };
 
   return (
-    <div className="fixed right-0 top-0 h-screen w-[420px] bg-white border-l border-border shadow-2xl z-50 flex flex-col">
+    <div className="fixed right-0 top-0 h-screen w-full sm:w-[420px] bg-white border-l border-border shadow-2xl z-50 flex flex-col">
       <div className="flex items-center justify-between p-6 border-b border-border">
         <div>
           <h2>Change Order</h2>

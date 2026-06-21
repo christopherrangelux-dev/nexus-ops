@@ -2,7 +2,7 @@ import { User, Bell, Shield, Key } from 'lucide-react';
 
 export function Settings() {
   return (
-    <div className="flex-1 p-8">
+    <div className="flex-1 p-4 sm:p-8">
       <div className="mb-6">
         <h1>Settings</h1>
         <p className="text-muted-foreground mt-1">Manage your account and preferences</p>
