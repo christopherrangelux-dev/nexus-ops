@@ -1,38 +1,13 @@
 import { useState } from 'react';
 import { mockAPIs, API } from '../data/mockData';
 import { Lock, Globe, Shield, AlertCircle, Settings2 } from 'lucide-react';
-import { LifecycleConsoleShell } from './lifecycle/LifecycleConsoleShell';
+import { ApiLifecycleConsole } from './api-console/ApiLifecycleConsole';
 
 export function APICatalog() {
   const [manageTarget, setManageTarget] = useState<API | null>(null);
-  const [activeSection, setActiveSection] = useState('dormancy');
 
   if (manageTarget) {
-    return (
-      <LifecycleConsoleShell
-        title={manageTarget.name}
-        subtitle="API Lifecycle Console"
-        sidebarInfo={[
-          { label: 'Owner', value: manageTarget.owner },
-          { label: 'Data sensitivity', value: manageTarget.dataSensitivity },
-        ]}
-        sections={[
-          { id: 'dormancy', label: 'Dormancy & Evidence' },
-          { id: 'entitlements', label: 'Entitlements' },
-          { id: 'validation', label: 'Request Validation' },
-          { id: 'status', label: 'Status & Retirement' },
-          { id: 'history', label: 'History' },
-        ]}
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-        onClose={() => {
-          setManageTarget(null);
-          setActiveSection('dormancy');
-        }}
-      >
-        <div className="text-muted-foreground">Coming in Phase 2-3</div>
-      </LifecycleConsoleShell>
-    );
+    return <ApiLifecycleConsole api={manageTarget} onClose={() => setManageTarget(null)} />;
   }
 
   const getSensitivityIcon = (level: string) => {
