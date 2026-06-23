@@ -6,9 +6,10 @@ import { ConfirmActionPanel } from '../lifecycle/ConfirmActionPanel';
 interface EntitlementsViewProps {
   api: API;
   onAuditEntry: (entry: AuditEntry) => void;
+  onNavigateToApp?: (applicationId: string, section: string) => void;
 }
 
-export function EntitlementsView({ api, onAuditEntry }: EntitlementsViewProps) {
+export function EntitlementsView({ api, onAuditEntry, onNavigateToApp }: EntitlementsViewProps) {
   const [entitlements, setEntitlements] = useState<Entitlement[]>(
     mockEntitlements.filter((ent) => ent.apiId === api.id)
   );
@@ -46,50 +47,63 @@ export function EntitlementsView({ api, onAuditEntry }: EntitlementsViewProps) {
       </div>
 
       <div className="bg-white border border-border rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border bg-muted/40">
-              <th className="text-left font-medium px-4 py-3">Scope</th>
-              <th className="text-left font-medium px-4 py-3">Granted to</th>
-              <th className="text-left font-medium px-4 py-3">Granted at</th>
-              <th className="text-left font-medium px-4 py-3">Expires at</th>
-              <th className="text-right font-medium px-4 py-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {entitlements.length === 0 && (
-              <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-muted-foreground">
-                  No entitlements granted for this API.
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/40">
+                <th className="text-left font-medium px-4 py-3">Scope</th>
+                <th className="text-left font-medium px-4 py-3">Granted to</th>
+                <th className="text-left font-medium px-4 py-3">Granted at</th>
+                <th className="text-left font-medium px-4 py-3">Expires at</th>
+                <th className="text-right font-medium px-4 py-3"></th>
               </tr>
-            )}
-            {entitlements.map((entitlement) => (
-              <tr key={entitlement.id} className="border-b border-border last:border-b-0">
-                <td className="px-4 py-3">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#ECE9F3] text-[#382B5F] text-xs border border-[#DCD5E8]">
-                    {entitlement.scope}
-                  </span>
-                </td>
-                <td className="px-4 py-3">{getApplicationName(entitlement.grantedToApplicationId)}</td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  {format(new Date(entitlement.grantedAt), 'MMM d, yyyy')}
-                </td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  {entitlement.expiresAt ? format(new Date(entitlement.expiresAt), 'MMM d, yyyy') : '—'}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <button
-                    onClick={() => setRevokeTarget(entitlement)}
-                    className="px-3 py-1.5 border border-border rounded text-xs font-medium hover:bg-muted transition-colors"
-                  >
-                    Revoke
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {entitlements.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-6 text-center text-muted-foreground">
+                    No entitlements granted for this API.
+                  </td>
+                </tr>
+              )}
+              {entitlements.map((entitlement) => (
+                <tr key={entitlement.id} className="border-b border-border last:border-b-0">
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#ECE9F3] text-[#382B5F] text-xs border border-[#DCD5E8]">
+                      {entitlement.scope}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {onNavigateToApp ? (
+                      <button
+                        onClick={() => onNavigateToApp(entitlement.grantedToApplicationId, 'scopes')}
+                        className="text-[#C2752E] hover:underline transition-colors"
+                      >
+                        {getApplicationName(entitlement.grantedToApplicationId)}
+                      </button>
+                    ) : (
+                      getApplicationName(entitlement.grantedToApplicationId)
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                    {format(new Date(entitlement.grantedAt), 'MMM d, yyyy')}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                    {entitlement.expiresAt ? format(new Date(entitlement.expiresAt), 'MMM d, yyyy') : '—'}
+                  </td>
+                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                    <button
+                      onClick={() => setRevokeTarget(entitlement)}
+                      className="px-3 py-1.5 border border-border rounded text-xs font-medium hover:bg-muted transition-colors"
+                    >
+                      Revoke
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {revokeTarget && (

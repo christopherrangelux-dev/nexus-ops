@@ -5,9 +5,10 @@ import { Application, APIRequest, mockEntitlements, mockAPIs } from '../../data/
 interface ApiScopesViewProps {
   application: Application;
   onSubmitRequest: (request: APIRequest) => void;
+  onNavigateToApi?: (apiId: string, section: string) => void;
 }
 
-export function ApiScopesView({ application, onSubmitRequest }: ApiScopesViewProps) {
+export function ApiScopesView({ application, onSubmitRequest, onNavigateToApi }: ApiScopesViewProps) {
   const [requestOpen, setRequestOpen] = useState(false);
 
   const grantedEntitlements = mockEntitlements.filter(
@@ -41,6 +42,14 @@ export function ApiScopesView({ application, onSubmitRequest }: ApiScopesViewPro
               >
                 <span className="font-medium">{ent.scope}</span>
                 <span className="text-[#382B5F]/70">· {getApiName(ent.apiId)}</span>
+                {onNavigateToApi && (
+                  <button
+                    onClick={() => onNavigateToApi(ent.apiId, 'entitlements')}
+                    className="text-[#C2752E] hover:underline transition-colors"
+                  >
+                    View entitlement →
+                  </button>
+                )}
               </span>
             ))}
           </div>

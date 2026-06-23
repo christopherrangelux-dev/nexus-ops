@@ -61,68 +61,70 @@ export function CustomPolicyView({ application, onAuditEntry }: CustomPolicyView
       </div>
 
       <div className="bg-white border border-border rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border bg-muted/40">
-              <th className="text-left font-medium px-4 py-3">Policy</th>
-              <th className="text-left font-medium px-4 py-3">Value</th>
-              <th className="text-left font-medium px-4 py-3">Last updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {policies.length === 0 && (
-              <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-muted-foreground">
-                  No custom policies configured for this application.
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/40">
+                <th className="text-left font-medium px-4 py-3">Policy</th>
+                <th className="text-left font-medium px-4 py-3">Value</th>
+                <th className="text-left font-medium px-4 py-3">Last updated</th>
               </tr>
-            )}
-            {policies.map((policy) => {
-              const isEditing = editingId === policy.id;
-
-              return (
-                <tr key={policy.id} className="border-b border-border last:border-b-0">
-                  <td className="px-4 py-3 font-medium">{policy.label}</td>
-                  <td className="px-4 py-3">
-                    {isEditing ? (
-                      <div className="flex items-center gap-2">
-                        <input
-                          autoFocus
-                          type="text"
-                          value={draftValue}
-                          onChange={(e) => setDraftValue(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') saveEdit(policy);
-                            if (e.key === 'Escape') cancelEditing();
-                          }}
-                          onBlur={() => saveEdit(policy)}
-                          className="px-2 py-1 border border-border rounded text-sm w-40"
-                        />
-                        <button
-                          onClick={() => saveEdit(policy)}
-                          className="p-1.5 hover:bg-muted rounded transition-colors"
-                          aria-label="Save"
-                        >
-                          <Check className="w-3.5 h-3.5 text-emerald-700" />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => startEditing(policy)}
-                        className="text-left hover:text-[#C2752E] hover:underline transition-colors"
-                      >
-                        {policy.value}
-                      </button>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {format(new Date(policy.updatedAt), 'MMM d, yyyy')}
+            </thead>
+            <tbody>
+              {policies.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="px-4 py-6 text-center text-muted-foreground">
+                    No custom policies configured for this application.
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              )}
+              {policies.map((policy) => {
+                const isEditing = editingId === policy.id;
+
+                return (
+                  <tr key={policy.id} className="border-b border-border last:border-b-0">
+                    <td className="px-4 py-3 font-medium whitespace-nowrap">{policy.label}</td>
+                    <td className="px-4 py-3">
+                      {isEditing ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            autoFocus
+                            type="text"
+                            value={draftValue}
+                            onChange={(e) => setDraftValue(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveEdit(policy);
+                              if (e.key === 'Escape') cancelEditing();
+                            }}
+                            onBlur={() => saveEdit(policy)}
+                            className="px-2 py-1 border border-border rounded text-sm w-40"
+                          />
+                          <button
+                            onClick={() => saveEdit(policy)}
+                            className="p-1.5 hover:bg-muted rounded transition-colors"
+                            aria-label="Save"
+                          >
+                            <Check className="w-3.5 h-3.5 text-emerald-700" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => startEditing(policy)}
+                          className="text-left hover:text-[#C2752E] hover:underline transition-colors"
+                        >
+                          {policy.value}
+                        </button>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                      {format(new Date(policy.updatedAt), 'MMM d, yyyy')}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -9,11 +9,13 @@ import { PendingRequestsView } from './PendingRequestsView';
 
 interface AppLifecycleConsoleProps {
   application: Application;
+  initialSection?: string;
   onClose: () => void;
+  onNavigateToApi?: (apiId: string, section: string) => void;
 }
 
-export function AppLifecycleConsole({ application, onClose }: AppLifecycleConsoleProps) {
-  const [activeSection, setActiveSection] = useState('status');
+export function AppLifecycleConsole({ application, initialSection, onClose, onNavigateToApi }: AppLifecycleConsoleProps) {
+  const [activeSection, setActiveSection] = useState(initialSection ?? 'status');
   // Consolidated feed for every audit entry generated during this session across all sections
   // of this console (status changes, policy edits, and scope requests) — History needs one
   // combined array rather than each section keeping its own isolated state.
@@ -35,7 +37,13 @@ export function AppLifecycleConsole({ application, onClose }: AppLifecycleConsol
       case 'policy':
         return <CustomPolicyView application={application} onAuditEntry={addAuditEntry} />;
       case 'scopes':
-        return <ApiScopesView application={application} onSubmitRequest={addApiRequest} />;
+        return (
+          <ApiScopesView
+            application={application}
+            onSubmitRequest={addApiRequest}
+            onNavigateToApi={onNavigateToApi}
+          />
+        );
       case 'pending':
         return (
           <PendingRequestsView application={application} localApiRequests={localApiRequests} />

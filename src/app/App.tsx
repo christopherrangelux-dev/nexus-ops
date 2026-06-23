@@ -5,15 +5,45 @@ import { APICatalog } from './components/APICatalog';
 import { ApprovalsDashboard } from './components/ApprovalsDashboard';
 import { Settings } from './components/Settings';
 
+// Deep-link target for cross-console navigation (e.g. "View entitlement" from an app's API
+// Scopes view, or "Granted to" from an API's Entitlements view). `view` picks the top-level
+// view, `id` identifies the API/Application to open, `section` seeds which console section
+// is active on arrival.
+export interface DeepLinkTarget {
+  view: 'apps' | 'catalog';
+  id: string;
+  section: string;
+}
+
 export default function App() {
   const [activeView, setActiveView] = useState('approvals');
+  const [deepLink, setDeepLink] = useState<DeepLinkTarget | null>(null);
+
+  const navigateTo = (view: 'apps' | 'catalog', id: string, section: string) => {
+    setActiveView(view);
+    setDeepLink({ view, id, section });
+  };
+
+  const clearDeepLink = () => setDeepLink(null);
 
   const renderView = () => {
     switch (activeView) {
       case 'apps':
-        return <ApplicationsList />;
+        return (
+          <ApplicationsList
+            deepLinkTarget={deepLink?.view === 'apps' ? deepLink : null}
+            onDeepLinkConsumed={clearDeepLink}
+            onNavigateTo={navigateTo}
+          />
+        );
       case 'catalog':
-        return <APICatalog />;
+        return (
+          <APICatalog
+            deepLinkTarget={deepLink?.view === 'catalog' ? deepLink : null}
+            onDeepLinkConsumed={clearDeepLink}
+            onNavigateTo={navigateTo}
+          />
+        );
       case 'approvals':
         return <ApprovalsDashboard />;
       case 'settings':

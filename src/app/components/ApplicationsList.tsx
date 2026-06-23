@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { mockApplications, Application, ChangeOrder } from '../data/mockData';
 import { StatusBadge } from './StatusBadge';
 import { Plus, Search, FileEdit, Settings2 } from 'lucide-react';
@@ -6,13 +6,21 @@ import { format } from 'date-fns';
 import { NewApplicationFlow } from './NewApplicationFlow';
 import { ChangeOrderPanel } from './ChangeOrderPanel';
 import { AppLifecycleConsole } from './app-console/AppLifecycleConsole';
+import type { DeepLinkTarget } from '../App';
 
-export function ApplicationsList() {
+interface ApplicationsListProps {
+  deepLinkTarget?: DeepLinkTarget | null;
+  onDeepLinkConsumed?: () => void;
+  onNavigateTo?: (view: 'apps' | 'catalog', id: string, section: string) => void;
+}
+
+export function ApplicationsList({ deepLinkTarget, onDeepLinkConsumed, onNavigateTo }: ApplicationsListProps = {}) {
   const [showNewAppFlow, setShowNewAppFlow] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [changeOrderTarget, setChangeOrderTarget] = useState<Application | null>(null);
   const [recentChangeOrders, setRecentChangeOrders] = useState<ChangeOrder[]>([]);
   const [manageTarget, setManageTarget] = useState<Application | null>(null);
+  const [initialSection, setInitialSection] = useState<string | undefined>(undefined);
 
   const filteredApps = mockApplications.filter(app =>
     app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -20,12 +28,29 @@ export function ApplicationsList() {
     app.department.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  useEffect(() => {
+    if (!deepLinkTarget) return;
+    const app = mockApplications.find((a) => a.id === deepLinkTarget.id);
+    if (app) {
+      setManageTarget(app);
+      setInitialSection(deepLinkTarget.section);
+    }
+    onDeepLinkConsumed?.();
+  }, [deepLinkTarget, onDeepLinkConsumed]);
+
   if (showNewAppFlow) {
     return <NewApplicationFlow onClose={() => setShowNewAppFlow(false)} />;
   }
 
   if (manageTarget) {
-    return <AppLifecycleConsole application={manageTarget} onClose={() => setManageTarget(null)} />;
+    return (
+      <AppLifecycleConsole
+        application={manageTarget}
+        initialSection={initialSection}
+        onClose={() => setManageTarget(null)}
+        onNavigateToApi={(apiId, section) => onNavigateTo?.('catalog', apiId, section)}
+      />
+    );
   }
 
   const handleChangeOrderSubmit = (order: Omit<ChangeOrder, 'id' | 'submittedAt'>) => {
@@ -125,7 +150,10 @@ export function ApplicationsList() {
                         Change Order
                       </button>
                       <button
-                        onClick={() => setManageTarget(app)}
+                        onClick={() => {
+                          setInitialSection(undefined);
+                          setManageTarget(app);
+                        }}
                         className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <Settings2 className="w-3.5 h-3.5" />
@@ -166,7 +194,10 @@ export function ApplicationsList() {
                   Change Order
                 </button>
                 <button
-                  onClick={() => setManageTarget(app)}
+                  onClick={() => {
+                    setInitialSection(undefined);
+                    setManageTarget(app);
+                  }}
                   className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Settings2 className="w-3.5 h-3.5" />

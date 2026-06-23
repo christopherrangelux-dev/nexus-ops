@@ -9,11 +9,13 @@ import { StatusRetirementView } from './StatusRetirementView';
 
 interface ApiLifecycleConsoleProps {
   api: API;
+  initialSection?: string;
   onClose: () => void;
+  onNavigateToApp?: (applicationId: string, section: string) => void;
 }
 
-export function ApiLifecycleConsole({ api, onClose }: ApiLifecycleConsoleProps) {
-  const [activeSection, setActiveSection] = useState('dormancy');
+export function ApiLifecycleConsole({ api, initialSection, onClose, onNavigateToApp }: ApiLifecycleConsoleProps) {
+  const [activeSection, setActiveSection] = useState(initialSection ?? 'dormancy');
   // Consolidated feed for every audit entry generated during this session across all sections
   // of this console (dormancy deactivations, entitlement revocations, retirement) — History
   // needs one combined array rather than each section keeping its own isolated state.
@@ -27,7 +29,13 @@ export function ApiLifecycleConsole({ api, onClose }: ApiLifecycleConsoleProps) 
       case 'dormancy':
         return <DormancyEvidencePanel api={api} onAuditEntry={addAuditEntry} />;
       case 'entitlements':
-        return <EntitlementsView api={api} onAuditEntry={addAuditEntry} />;
+        return (
+          <EntitlementsView
+            api={api}
+            onAuditEntry={addAuditEntry}
+            onNavigateToApp={onNavigateToApp}
+          />
+        );
       case 'validation':
         return <ValidationRulesView api={api} />;
       case 'status':

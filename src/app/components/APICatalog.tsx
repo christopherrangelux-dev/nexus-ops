@@ -1,13 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { mockAPIs, API } from '../data/mockData';
 import { Lock, Globe, Shield, AlertCircle, Settings2 } from 'lucide-react';
 import { ApiLifecycleConsole } from './api-console/ApiLifecycleConsole';
+import type { DeepLinkTarget } from '../App';
 
-export function APICatalog() {
+interface APICatalogProps {
+  deepLinkTarget?: DeepLinkTarget | null;
+  onDeepLinkConsumed?: () => void;
+  onNavigateTo?: (view: 'apps' | 'catalog', id: string, section: string) => void;
+}
+
+export function APICatalog({ deepLinkTarget, onDeepLinkConsumed, onNavigateTo }: APICatalogProps = {}) {
   const [manageTarget, setManageTarget] = useState<API | null>(null);
+  const [initialSection, setInitialSection] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!deepLinkTarget) return;
+    const api = mockAPIs.find((a) => a.id === deepLinkTarget.id);
+    if (api) {
+      setManageTarget(api);
+      setInitialSection(deepLinkTarget.section);
+    }
+    onDeepLinkConsumed?.();
+  }, [deepLinkTarget, onDeepLinkConsumed]);
 
   if (manageTarget) {
-    return <ApiLifecycleConsole api={manageTarget} onClose={() => setManageTarget(null)} />;
+    return (
+      <ApiLifecycleConsole
+        api={manageTarget}
+        initialSection={initialSection}
+        onClose={() => setManageTarget(null)}
+        onNavigateToApp={(applicationId, section) => onNavigateTo?.('apps', applicationId, section)}
+      />
+    );
   }
 
   const getSensitivityIcon = (level: string) => {
@@ -115,7 +140,10 @@ export function APICatalog() {
                   Request Access
                 </button>
                 <button
-                  onClick={() => setManageTarget(api)}
+                  onClick={() => {
+                    setInitialSection(undefined);
+                    setManageTarget(api);
+                  }}
                   className="flex items-center justify-center gap-1.5 px-4 py-2 border border-border rounded hover:bg-muted transition-colors"
                 >
                   <Settings2 className="w-3.5 h-3.5" />
