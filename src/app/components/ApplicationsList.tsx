@@ -5,7 +5,7 @@ import { Plus, Search, FileEdit, Settings2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { NewApplicationFlow } from './NewApplicationFlow';
 import { ChangeOrderPanel } from './ChangeOrderPanel';
-import { LifecycleConsoleShell } from './lifecycle/LifecycleConsoleShell';
+import { AppLifecycleConsole } from './app-console/AppLifecycleConsole';
 
 export function ApplicationsList() {
   const [showNewAppFlow, setShowNewAppFlow] = useState(false);
@@ -13,7 +13,6 @@ export function ApplicationsList() {
   const [changeOrderTarget, setChangeOrderTarget] = useState<Application | null>(null);
   const [recentChangeOrders, setRecentChangeOrders] = useState<ChangeOrder[]>([]);
   const [manageTarget, setManageTarget] = useState<Application | null>(null);
-  const [activeSection, setActiveSection] = useState('status');
 
   const filteredApps = mockApplications.filter(app =>
     app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -26,31 +25,7 @@ export function ApplicationsList() {
   }
 
   if (manageTarget) {
-    return (
-      <LifecycleConsoleShell
-        title={manageTarget.name}
-        subtitle="Application Lifecycle Console"
-        sidebarInfo={[
-          { label: 'Owner', value: manageTarget.owner },
-          { label: 'Department', value: manageTarget.department },
-        ]}
-        sections={[
-          { id: 'status', label: 'Status & Policy' },
-          { id: 'policy', label: 'Custom Policy' },
-          { id: 'scopes', label: 'API Scopes' },
-          { id: 'pending', label: 'Pending Requests' },
-          { id: 'history', label: 'History' },
-        ]}
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-        onClose={() => {
-          setManageTarget(null);
-          setActiveSection('status');
-        }}
-      >
-        <div className="text-muted-foreground">Coming in Phase 4-5</div>
-      </LifecycleConsoleShell>
-    );
+    return <AppLifecycleConsole application={manageTarget} onClose={() => setManageTarget(null)} />;
   }
 
   const handleChangeOrderSubmit = (order: Omit<ChangeOrder, 'id' | 'submittedAt'>) => {
