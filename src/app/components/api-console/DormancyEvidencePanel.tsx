@@ -13,9 +13,10 @@ import { ConfirmActionPanel } from '../lifecycle/ConfirmActionPanel';
 
 interface DormancyEvidencePanelProps {
   api: API;
+  onAuditEntry: (entry: AuditEntry) => void;
 }
 
-export function DormancyEvidencePanel({ api }: DormancyEvidencePanelProps) {
+export function DormancyEvidencePanel({ api, onAuditEntry }: DormancyEvidencePanelProps) {
   const [endpoints] = useState<Endpoint[]>(
     mockEndpoints.filter((ep) => api.endpoints.includes(ep.id))
   );
@@ -26,10 +27,6 @@ export function DormancyEvidencePanel({ api }: DormancyEvidencePanelProps) {
   const [deactivatedIds, setDeactivatedIds] = useState<Set<string>>(new Set());
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deactivateTarget, setDeactivateTarget] = useState<Endpoint | null>(null);
-  // Audit entries are kept here as local state for now rather than threaded up to a shared
-  // store — there's no History view yet to consume them (that's Phase 3), so this just
-  // preserves the shape until that view exists.
-  const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([]);
 
   const toggleExpanded = (endpointId: string) => {
     setExpandedId((current) => (current === endpointId ? null : endpointId));
@@ -40,19 +37,16 @@ export function DormancyEvidencePanel({ api }: DormancyEvidencePanelProps) {
 
     setDeactivatedIds((current) => new Set(current).add(deactivateTarget.id));
 
-    setAuditEntries((current) => [
-      ...current,
-      {
-        id: `audit-local-${Date.now()}`,
-        targetType: 'endpoint',
-        targetId: deactivateTarget.id,
-        targetName: `${deactivateTarget.method} ${deactivateTarget.path}`,
-        action: 'deactivated',
-        actor: 'Data Product Manager',
-        occurredAt: new Date().toISOString(),
-        detail: `Endpoint ${deactivateTarget.method} ${deactivateTarget.path} deactivated based on dormancy evidence.`,
-      },
-    ]);
+    onAuditEntry({
+      id: `audit-local-${Date.now()}`,
+      targetType: 'endpoint',
+      targetId: deactivateTarget.id,
+      targetName: `${deactivateTarget.method} ${deactivateTarget.path}`,
+      action: 'deactivated',
+      actor: 'Data Product Manager',
+      occurredAt: new Date().toISOString(),
+      detail: `Endpoint ${deactivateTarget.method} ${deactivateTarget.path} deactivated based on dormancy evidence.`,
+    });
 
     return 'success';
   };

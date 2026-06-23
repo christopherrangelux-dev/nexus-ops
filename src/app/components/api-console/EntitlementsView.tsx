@@ -5,16 +5,14 @@ import { ConfirmActionPanel } from '../lifecycle/ConfirmActionPanel';
 
 interface EntitlementsViewProps {
   api: API;
+  onAuditEntry: (entry: AuditEntry) => void;
 }
 
-export function EntitlementsView({ api }: EntitlementsViewProps) {
+export function EntitlementsView({ api, onAuditEntry }: EntitlementsViewProps) {
   const [entitlements, setEntitlements] = useState<Entitlement[]>(
     mockEntitlements.filter((ent) => ent.apiId === api.id)
   );
   const [revokeTarget, setRevokeTarget] = useState<Entitlement | null>(null);
-  // Same local-state-only convention as DormancyEvidencePanel — see that file's comment for why
-  // these aren't threaded up to a shared store yet.
-  const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([]);
 
   const getApplicationName = (applicationId: string) =>
     mockApplications.find((app) => app.id === applicationId)?.name ?? 'Unknown application';
@@ -24,19 +22,16 @@ export function EntitlementsView({ api }: EntitlementsViewProps) {
 
     setEntitlements((current) => current.filter((ent) => ent.id !== revokeTarget.id));
 
-    setAuditEntries((current) => [
-      ...current,
-      {
-        id: `audit-local-${Date.now()}`,
-        targetType: 'api',
-        targetId: api.id,
-        targetName: api.name,
-        action: 'updated',
-        actor: 'Data Product Manager',
-        occurredAt: new Date().toISOString(),
-        detail: `Revoked ${revokeTarget.scope} entitlement from ${getApplicationName(revokeTarget.grantedToApplicationId)}.`,
-      },
-    ]);
+    onAuditEntry({
+      id: `audit-local-${Date.now()}`,
+      targetType: 'api',
+      targetId: api.id,
+      targetName: api.name,
+      action: 'updated',
+      actor: 'Data Product Manager',
+      occurredAt: new Date().toISOString(),
+      detail: `Revoked ${revokeTarget.scope} entitlement from ${getApplicationName(revokeTarget.grantedToApplicationId)}.`,
+    });
 
     return 'success';
   };

@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { API } from '../../data/mockData';
+import { API, AuditEntry, mockAuditEntries } from '../../data/mockData';
 import { LifecycleConsoleShell } from '../lifecycle/LifecycleConsoleShell';
+import { AuditHistoryTable } from '../lifecycle/AuditHistoryTable';
 import { DormancyEvidencePanel } from './DormancyEvidencePanel';
 import { EntitlementsView } from './EntitlementsView';
+import { ValidationRulesView } from './ValidationRulesView';
+import { StatusRetirementView } from './StatusRetirementView';
 
 interface ApiLifecycleConsoleProps {
   api: API;
@@ -11,17 +14,33 @@ interface ApiLifecycleConsoleProps {
 
 export function ApiLifecycleConsole({ api, onClose }: ApiLifecycleConsoleProps) {
   const [activeSection, setActiveSection] = useState('dormancy');
+  // Consolidated feed for every audit entry generated during this session across all sections
+  // of this console (dormancy deactivations, entitlement revocations, retirement) — History
+  // needs one combined array rather than each section keeping its own isolated state.
+  const [localAuditEntries, setLocalAuditEntries] = useState<AuditEntry[]>([]);
+
+  const addAuditEntry = (entry: AuditEntry) =>
+    setLocalAuditEntries((current) => [...current, entry]);
 
   const renderSection = () => {
     switch (activeSection) {
       case 'dormancy':
-        return <DormancyEvidencePanel api={api} />;
+        return <DormancyEvidencePanel api={api} onAuditEntry={addAuditEntry} />;
       case 'entitlements':
-        return <EntitlementsView api={api} />;
+        return <EntitlementsView api={api} onAuditEntry={addAuditEntry} />;
       case 'validation':
+        return <ValidationRulesView api={api} />;
       case 'status':
-      case 'history':
-        return <div className="text-muted-foreground">Coming in Phase 3</div>;
+        return <StatusRetirementView api={api} onAuditEntry={addAuditEntry} />;
+      case 'history': {
+        const relevantIds = new Set([api.id, ...api.endpoints]);
+        const isRelevant = (entry: AuditEntry) => relevantIds.has(entry.targetId);
+        const combined = [
+          ...mockAuditEntries.filter(isRelevant),
+          ...localAuditEntries.filter(isRelevant),
+        ].sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime());
+        return <AuditHistoryTable entries={combined} />;
+      }
       default:
         return null;
     }
