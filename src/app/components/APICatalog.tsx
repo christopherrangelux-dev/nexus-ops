@@ -1,7 +1,40 @@
-import { mockAPIs } from '../data/mockData';
-import { Lock, Globe, Shield, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { mockAPIs, API } from '../data/mockData';
+import { Lock, Globe, Shield, AlertCircle, Settings2 } from 'lucide-react';
+import { LifecycleConsoleShell } from './lifecycle/LifecycleConsoleShell';
 
 export function APICatalog() {
+  const [manageTarget, setManageTarget] = useState<API | null>(null);
+  const [activeSection, setActiveSection] = useState('dormancy');
+
+  if (manageTarget) {
+    return (
+      <LifecycleConsoleShell
+        title={manageTarget.name}
+        subtitle="API Lifecycle Console"
+        sidebarInfo={[
+          { label: 'Owner', value: manageTarget.owner },
+          { label: 'Data sensitivity', value: manageTarget.dataSensitivity },
+        ]}
+        sections={[
+          { id: 'dormancy', label: 'Dormancy & Evidence' },
+          { id: 'entitlements', label: 'Entitlements' },
+          { id: 'validation', label: 'Request Validation' },
+          { id: 'status', label: 'Status & Retirement' },
+          { id: 'history', label: 'History' },
+        ]}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        onClose={() => {
+          setManageTarget(null);
+          setActiveSection('dormancy');
+        }}
+      >
+        <div className="text-muted-foreground">Coming in Phase 2-3</div>
+      </LifecycleConsoleShell>
+    );
+  }
+
   const getSensitivityIcon = (level: string) => {
     switch (level) {
       case 'pii':
@@ -102,9 +135,18 @@ export function APICatalog() {
                 </div>
               )}
 
-              <button className="w-full mt-4 px-4 py-2 border border-[#C2752E] text-[#C2752E] rounded hover:bg-[#ECE9F3] transition-colors">
-                Request Access
-              </button>
+              <div className="flex gap-2 mt-4">
+                <button className="flex-1 px-4 py-2 border border-[#C2752E] text-[#C2752E] rounded hover:bg-[#ECE9F3] transition-colors">
+                  Request Access
+                </button>
+                <button
+                  onClick={() => setManageTarget(api)}
+                  className="flex items-center justify-center gap-1.5 px-4 py-2 border border-border rounded hover:bg-muted transition-colors"
+                >
+                  <Settings2 className="w-3.5 h-3.5" />
+                  Manage
+                </button>
+              </div>
             </div>
           </div>
         ))}

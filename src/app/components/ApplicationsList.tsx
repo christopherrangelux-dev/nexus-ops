@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { mockApplications, Application, ChangeOrder } from '../data/mockData';
 import { StatusBadge } from './StatusBadge';
-import { Plus, Search, FileEdit } from 'lucide-react';
+import { Plus, Search, FileEdit, Settings2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { NewApplicationFlow } from './NewApplicationFlow';
 import { ChangeOrderPanel } from './ChangeOrderPanel';
+import { LifecycleConsoleShell } from './lifecycle/LifecycleConsoleShell';
 
 export function ApplicationsList() {
   const [showNewAppFlow, setShowNewAppFlow] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [changeOrderTarget, setChangeOrderTarget] = useState<Application | null>(null);
   const [recentChangeOrders, setRecentChangeOrders] = useState<ChangeOrder[]>([]);
+  const [manageTarget, setManageTarget] = useState<Application | null>(null);
+  const [activeSection, setActiveSection] = useState('status');
 
   const filteredApps = mockApplications.filter(app =>
     app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -20,6 +23,34 @@ export function ApplicationsList() {
 
   if (showNewAppFlow) {
     return <NewApplicationFlow onClose={() => setShowNewAppFlow(false)} />;
+  }
+
+  if (manageTarget) {
+    return (
+      <LifecycleConsoleShell
+        title={manageTarget.name}
+        subtitle="Application Lifecycle Console"
+        sidebarInfo={[
+          { label: 'Owner', value: manageTarget.owner },
+          { label: 'Department', value: manageTarget.department },
+        ]}
+        sections={[
+          { id: 'status', label: 'Status & Policy' },
+          { id: 'policy', label: 'Custom Policy' },
+          { id: 'scopes', label: 'API Scopes' },
+          { id: 'pending', label: 'Pending Requests' },
+          { id: 'history', label: 'History' },
+        ]}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        onClose={() => {
+          setManageTarget(null);
+          setActiveSection('status');
+        }}
+      >
+        <div className="text-muted-foreground">Coming in Phase 4-5</div>
+      </LifecycleConsoleShell>
+    );
   }
 
   const handleChangeOrderSubmit = (order: Omit<ChangeOrder, 'id' | 'submittedAt'>) => {
@@ -110,13 +141,22 @@ export function ApplicationsList() {
                     {format(new Date(app.updatedAt), 'MMM d, yyyy')}
                   </td>
                   <td className="px-6 py-4">
-                    <button
-                      onClick={() => setChangeOrderTarget(app)}
-                      className="flex items-center gap-1.5 text-sm text-[#C2752E] hover:text-[#9C5E25] transition-colors"
-                    >
-                      <FileEdit className="w-3.5 h-3.5" />
-                      Change Order
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setChangeOrderTarget(app)}
+                        className="flex items-center gap-1.5 text-sm text-[#C2752E] hover:text-[#9C5E25] transition-colors"
+                      >
+                        <FileEdit className="w-3.5 h-3.5" />
+                        Change Order
+                      </button>
+                      <button
+                        onClick={() => setManageTarget(app)}
+                        className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Settings2 className="w-3.5 h-3.5" />
+                        Manage
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -142,13 +182,22 @@ export function ApplicationsList() {
                   {format(new Date(app.updatedAt), 'MMM d, yyyy')}
                 </div>
               </div>
-              <button
-                onClick={() => setChangeOrderTarget(app)}
-                className="flex items-center gap-1.5 text-sm text-[#C2752E] hover:text-[#9C5E25] transition-colors"
-              >
-                <FileEdit className="w-3.5 h-3.5" />
-                Change Order
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setChangeOrderTarget(app)}
+                  className="flex items-center gap-1.5 text-sm text-[#C2752E] hover:text-[#9C5E25] transition-colors"
+                >
+                  <FileEdit className="w-3.5 h-3.5" />
+                  Change Order
+                </button>
+                <button
+                  onClick={() => setManageTarget(app)}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Settings2 className="w-3.5 h-3.5" />
+                  Manage
+                </button>
+              </div>
             </div>
           ))}
         </div>
